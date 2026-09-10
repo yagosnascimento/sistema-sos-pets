@@ -59,6 +59,32 @@ Apenas acesse o link: https://sospets.onrender.com
 
 -----
 
+## Como Executar com Docker
+
+O [Dockerfile](Dockerfile) na raiz do projeto builda o frontend (React) e o backend (Spring Boot) juntos, gerando uma única imagem que serve os dois na porta `8080`. O container roda com o perfil `docker`, que usa um banco H2 em memória (não precisa de Postgres externo).
+
+```bash
+# 1. Build da imagem (executar na raiz do repositório)
+docker build -t sospets:latest .
+
+# 2. Rodar o container
+docker run -d --name sospets-app -p 8080:8080 sospets:latest
+
+# 3. Acompanhar os logs
+docker logs -f sospets-app
+
+# 4. Acessar
+# Frontend: http://localhost:8080
+# API:      http://localhost:8080/tutores
+
+# 5. Parar e remover o container
+docker rm -f sospets-app
+```
+
+Se a porta `8080` já estiver em uso na sua máquina, troque o mapeamento para, por exemplo, `-p 8081:8080` e acesse pela porta `8081`.
+
+-----
+
 ## Configuração
 
 As configurações da aplicação encontram-se em `backend/src/main/resources/application.properties`.

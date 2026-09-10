@@ -1,0 +1,7 @@
+**/node_modules
+**/target
+**/build
+**/.git
+**/*.log
+sospets.api/data.mv.db
+sospets.api/data.trace.db
