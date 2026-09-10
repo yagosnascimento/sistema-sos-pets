@@ -40,12 +40,14 @@ O sistema permite o registo e gestão (CRUD) das seguintes entidades:
 
 ```text
 sistema-sos-pets/
-├── backend/            # API Spring Boot
+├── Dockerfile          # Build da imagem única (frontend + backend)
+├── docker-compose.yml  # Automação app + banco Postgres
+│
+├── sospets.api/        # API Spring Boot
 │   ├── src/            # Código fonte Java (Controllers, Entities, Services)
-│   ├── Dockerfile      # Configuração Docker
 │   └── pom.xml         # Dependências Maven
 │
-└── sospets-react/      # Interface React
+└── sospets.web/        # Interface React
     ├── public/         # Ficheiros estáticos
     ├── src/            # Componentes e Páginas (Pages)
     └── package.json    # Dependências Node
@@ -85,9 +87,40 @@ Se a porta `8080` já estiver em uso na sua máquina, troque o mapeamento para, 
 
 -----
 
+## Como Executar com Docker Compose
+
+O [docker-compose.yml](docker-compose.yml) automatiza a stack completa: sobe um banco **PostgreSQL** e o **app** (frontend + backend) já conectados entre si na mesma rede, sem precisar configurar nada manualmente.
+
+```bash
+# 1. Build + subir os serviços (app + banco Postgres)
+docker compose up -d --build
+
+# 2. Acompanhar os logs
+docker compose logs -f app
+
+# 3. Acessar
+# Frontend: http://localhost:8082
+# API:      http://localhost:8082/tutores
+
+# 4. Parar os serviços (mantém o volume do banco)
+docker compose down
+
+# 5. Parar e apagar também os dados do banco
+docker compose down -v
+```
+
+Se a porta `8082` já estiver em uso, altere o mapeamento em `docker-compose.yml` (serviço `app`, seção `ports`).
+
+-----
+
 ## Configuração
 
-As configurações da aplicação encontram-se em `backend/src/main/resources/application.properties`.
-O projeto possui perfis configurados (`application-local.properties` e `application-prod.properties`) para facilitar a troca entre ambiente de desenvolvimento e produção.
+As configurações da aplicação encontram-se em `sospets.api/src/main/resources/application.properties`.
+O projeto possui perfis configurados para cada ambiente:
+
+* `application-local.properties` — desenvolvimento local com Postgres.
+* `application-prod.properties` — produção (Render), credenciais via variáveis de ambiente.
+* `application-docker.properties` — usado pelo `Dockerfile`, banco H2 em memória.
+* `application-compose.properties` — usado pelo `docker-compose.yml`, conecta no serviço `db` (Postgres).
 
 -----

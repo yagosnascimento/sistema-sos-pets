@@ -1,0 +1,34 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: sospets-db
+    environment:
+      POSTGRES_DB: sospets_db
+      POSTGRES_USER: sospets
+      POSTGRES_PASSWORD: sospets123
+    volumes:
+      - sospets_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sospets -d sospets_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    container_name: sospets-app
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: compose
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: sospets_db
+      DB_USERNAME: sospets
+      DB_PASSWORD: sospets123
+    ports:
+      - "8082:8080"
+
+volumes:
+  sospets_db_data:
